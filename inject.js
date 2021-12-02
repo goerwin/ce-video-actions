@@ -10,6 +10,18 @@
   if (RegExp('https://www.rojadirectatv.tv/').test(url)) return handleRDTV();
 })();
 
+function runFnOnShortcutDown(fn) {
+  return (evt) => {
+    evt = evt || window.event;
+    const keyCode = evt.keyCode;
+
+    if (!(keyCode === 27 || (evt.altKey && keyCode === 84))) return;
+
+    evt.preventDefault();
+    evt.stopPropagation();
+    fn(evt);
+  };
+}
 function handleTwitch() {
   const head = document.head || document.getElementsByTagName('head')[0];
   const style = document.createElement('style');
@@ -23,44 +35,34 @@ function handleTwitch() {
   );
   head.appendChild(style);
 
-  function toggleVideo() {
-    const videoContainerEl =
-      document.getElementsByClassName('persistent-player')[0];
-
-    if (!videoContainerEl) return;
-
-    const theatherModeBtn =
-      document.querySelector('[data-a-target="player-theatre-mode-button"]') ||
-      document.getElementsByClassName('qa-theatre-mode-button')[0];
-
-    if (!theatherModeBtn) return;
-
-    if (videoContainerEl.classList.contains('persistent-player--fullscreen')) {
-      videoContainerEl.classList.remove('persistent-player--fullscreen');
-      theatherModeBtn.click();
-    } else if (
-      videoContainerEl.classList.contains('persistent-player--theatre')
-    ) {
-      videoContainerEl.classList.add('persistent-player--fullscreen');
-    } else {
-      theatherModeBtn.click();
-    }
-  }
-
   // https://stackoverflow.com/a/13880739/1623282
   document.addEventListener(
     'keydown',
-    function (evt) {
-      evt = evt || window.event;
-      const keyCode = evt.keyCode;
-      if (keyCode === 27 || (evt.altKey && keyCode === 84)) {
-        // esc or alt + t (F6)
+    runFnOnShortcutDown(() => {
+      const videoContainerEl =
+        document.getElementsByClassName('persistent-player')[0];
 
-        toggleVideo();
-        evt.preventDefault();
-        evt.stopPropagation();
+      if (!videoContainerEl) return;
+
+      const theatherModeBtn =
+        document.querySelector(
+          '[data-a-target="player-theatre-mode-button"]'
+        ) || document.getElementsByClassName('qa-theatre-mode-button')[0];
+
+      if (!theatherModeBtn) return;
+
+      if (
+        videoContainerEl.classList.contains('persistent-player--fullscreen')
+      ) {
+        videoContainerEl.classList.remove('persistent-player--fullscreen');
+        return theatherModeBtn.click();
       }
-    },
+
+      if (videoContainerEl.classList.contains('persistent-player--theatre'))
+        return videoContainerEl.classList.add('persistent-player--fullscreen');
+
+      theatherModeBtn.click();
+    }),
     true
   );
 }
@@ -121,9 +123,7 @@ function handleYoutube() {
   style.appendChild(document.createTextNode(css));
 
   function handleToggleFullScreen(evt = null, options = {}) {
-    if (!g_newMaximizeBtn) {
-      return;
-    }
+    if (!g_newMaximizeBtn) return;
 
     const toggleTheaterButton = document.querySelector('.ytp-size-button');
     const isInTheaterMode = !!document.querySelector(
@@ -173,31 +173,20 @@ function handleYoutube() {
     appendNewMaximizeBtn();
   }, 1000);
 
-  // https://stackoverflow.com/a/13880739/1623282
   document.addEventListener(
     'keydown',
-    function (evt) {
-      evt = evt || window.event;
-      const keyCode = evt.keyCode;
-      if (keyCode === 27 || (evt.altKey && keyCode === 84)) {
-        // esc or alt + t (F6)
-        !g_newMaximizeBtn && appendNewMaximizeBtn();
-        handleToggleFullScreen(null, { noFullscreen: evt && evt.shiftKey });
-      }
-    },
-    true
+    runFnOnShortcutDown((evt) => {
+      !g_newMaximizeBtn && appendNewMaximizeBtn();
+      handleToggleFullScreen(null, { noFullscreen: evt && evt.shiftKey });
+    })
   );
 }
 
 function handleRDTV() {
-  document.addEventListener('keydown', (evt) => {
-    evt = evt || window.event;
-    const keyCode = evt.keyCode;
-
-    if (!(keyCode === 27 || (evt.altKey && keyCode === 84))) return;
-
-    // esc or alt + t (F6)
-    const cssStr = `
+  document.addEventListener(
+    'keydown',
+    runFnOnShortcutDown(() => {
+      const cssStr = `
       #streamIframe#streamIframe {
         position: fixed !important;
         top: 0 !important;
@@ -209,14 +198,17 @@ function handleRDTV() {
         max-height: none !important;
       }`;
 
-    const head = document.head || document.getElementsByTagName('head')[0];
-    const currentStyleEl = document.getElementById('ce-video-actions-styletag');
+      const head = document.head || document.getElementsByTagName('head')[0];
+      const currentStyleEl = document.getElementById(
+        'ce-video-actions-styletag'
+      );
 
-    if (currentStyleEl) return currentStyleEl.remove();
+      if (currentStyleEl) return currentStyleEl.remove();
 
-    const style = document.createElement('style');
-    style.appendChild(document.createTextNode(cssStr));
-    style.setAttribute('id', 'ce-video-actions-styletag');
-    head.appendChild(style);
-  });
+      const style = document.createElement('style');
+      style.appendChild(document.createTextNode(cssStr));
+      style.setAttribute('id', 'ce-video-actions-styletag');
+      head.appendChild(style);
+    })
+  );
 }
