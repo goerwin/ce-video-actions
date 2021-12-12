@@ -7,7 +7,9 @@
 
   if (RegExp('https://www.twitch.tv/').test(url)) return handleTwitch();
   if (RegExp('https://www.youtube.com/').test(url)) return handleYoutube();
-  if (RegExp('https://www.rojadirectatv.tv/').test(url)) return handleRDTV();
+  if (RegExp('https://www.rojadirectatv.tv/').test(url)) return handleOthers();
+  if (RegExp('https://www.rojadirectatv.global/').test(url))
+    return handleOthers();
 })();
 
 function runFnOnShortcutDown(fn) {
@@ -27,10 +29,38 @@ function handleTwitch() {
   const style = document.createElement('style');
   style.appendChild(
     document.createTextNode(`
-      .persistent-player.persistent-player--fullscreen {
+      /* Video player in theather mode */
+      body.ce-custom-theather .persistent-player {
           width: 100% !important;
           z-index: 1000000 !important;
+          height: calc(100vw * 9 / 16) !important;
       }
+
+      /* Twitch chat */
+      body.ce-custom-theather .right-column {
+        position: fixed !important;
+        display: block !important;
+        z-index: 9999999 !important;
+        width: 100vw !important;
+        height: auto !important;
+        left: 0 !important;
+        top: calc(100vw * 9 / 16) !important;
+        bottom: 0;
+      }
+
+      body.ce-custom-theather .right-column > div[class*=Layout-sc]:first-child {
+        display: block !important;
+      }
+
+      body.ce-custom-theather .right-column .channel-root__right-column {
+        width: 100% !important;
+      }
+
+      /*
+      body.ce-custom-theather .channel-root__right-column.channel-root__right-column--expanded {
+        transform: none !important;
+      }
+      */
     `)
   );
   head.appendChild(style);
@@ -51,15 +81,13 @@ function handleTwitch() {
 
       if (!theatherModeBtn) return;
 
-      if (
-        videoContainerEl.classList.contains('persistent-player--fullscreen')
-      ) {
-        videoContainerEl.classList.remove('persistent-player--fullscreen');
+      if (document.body.classList.contains('ce-custom-theather')) {
+        document.body.classList.remove('ce-custom-theather');
         return theatherModeBtn.click();
       }
 
       if (videoContainerEl.classList.contains('persistent-player--theatre'))
-        return videoContainerEl.classList.add('persistent-player--fullscreen');
+        return document.body.classList.add('ce-custom-theather');
 
       theatherModeBtn.click();
     }),
@@ -182,12 +210,18 @@ function handleYoutube() {
   );
 }
 
-function handleRDTV() {
+function handleOthers() {
   document.addEventListener(
     'keydown',
     runFnOnShortcutDown(() => {
       const cssStr = `
-      #streamIframe#streamIframe {
+      body, html {
+        overflow: hidden !important;
+      }
+
+      #streamIframe#streamIframe,
+      #player#player iframe,
+      .Video.Video.Video.Video iframe {
         position: fixed !important;
         top: 0 !important;
         left: 0 !important;
