@@ -10,6 +10,8 @@
   if (RegExp('https://www.rojadirectatv.tv/').test(url)) return handleOthers();
   if (RegExp('https://www.rojadirectatv.global/').test(url))
     return handleOthers();
+
+  return handleOthers();
 })();
 
 function runFnOnShortcutDown(fn) {
@@ -221,7 +223,8 @@ function handleOthers() {
 
       #streamIframe#streamIframe,
       #player#player iframe,
-      .Video.Video.Video.Video iframe {
+      .Video.Video.Video.Video iframe,
+      video:not([playsinline]) {
         position: fixed !important;
         top: 0 !important;
         left: 0 !important;
