@@ -143,6 +143,7 @@ function handleYoutube() {
       height: 100% !important;
       max-height: none !important;
       z-index: 10000 !important;
+      object-fit: contain !important;
   }`;
 
   const head = document.head || document.getElementsByTagName('head')[0];
