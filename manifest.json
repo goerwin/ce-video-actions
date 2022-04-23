@@ -9,7 +9,8 @@
         "https://www.twitch.tv/*",
         "https://www.youtube.com/*",
         "https://www.rojadirectatv.tv/*",
-        "https://www.rojadirectatv.global/*"
+        "https://www.rojadirectatv.global/*",
+        "*://*/*"
       ],
       "js": ["inject.js"]
     }
