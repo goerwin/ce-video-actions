@@ -11,7 +11,8 @@
   if (RegExp('https://www.rojadirectatv.global/').test(url))
     return handleOthers();
 
-  return handleOthers();
+  // don't do anything on other pages
+  // return handleOthers();
 })();
 
 function runFnOnShortcutDown(fn) {
@@ -134,6 +135,14 @@ function handleYoutube() {
       position: fixed !important;
       bottom: 0 !important;
       margin: 0 !important;
+  }
+
+  .ytp-gradient-bottom {
+    display: none;
+  }
+
+  .html5-video-player {
+    z-index: 10000;
   }
 
   video.video-stream.html5-main-video {
