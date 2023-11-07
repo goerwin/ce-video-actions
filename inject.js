@@ -137,10 +137,6 @@ function handleYoutube() {
       margin: 0 !important;
   }
 
-  .ytp-gradient-bottom {
-    display: none;
-  }
-
   .html5-video-player {
     z-index: 10000;
   }
