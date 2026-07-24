@@ -1,6 +1,6 @@
 {
-  "name": "ce-tab-actions",
-  "description": "Chrome extension that opens the current tab in a popup",
+  "name": "ce-video-actions",
+  "description": "Chrome extension that adds actions to the video player",
   "devDependencies": {
     "@types/chrome": "^0.0.164"
   }

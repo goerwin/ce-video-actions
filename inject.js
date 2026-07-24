@@ -7,12 +7,6 @@
 
   if (RegExp('https://www.twitch.tv/').test(url)) return handleTwitch();
   if (RegExp('https://www.youtube.com/').test(url)) return handleYoutube();
-  if (RegExp('https://www.rojadirectatv.tv/').test(url)) return handleOthers();
-  if (RegExp('https://www.rojadirectatv.global/').test(url))
-    return handleOthers();
-
-  // don't do anything on other pages
-  // return handleOthers();
 })();
 
 function runFnOnShortcutDown(fn) {
@@ -192,15 +186,14 @@ function handleYoutube() {
   }
 
   function appendNewMaximizeBtn() {
-    const maximizeBtn = document.getElementsByClassName(
-      'ytp-fullscreen-button ytp-button'
-    )[0];
+    const maximizeBtn =
+      document.querySelector('.ytp-fullscreen-button.ytp-button') ||
+      document.querySelector('button[aria-label*="Full screen" i]');
 
     if (!maximizeBtn) return;
 
     g_newMaximizeBtn = maximizeBtn.cloneNode(true);
-    const controlsEl = document.getElementsByClassName('ytp-right-controls')[0];
-    controlsEl.insertBefore(g_newMaximizeBtn, maximizeBtn);
+    maximizeBtn.parentNode.insertBefore(g_newMaximizeBtn, maximizeBtn);
     g_newMaximizeBtn.onclick = handleToggleFullScreen;
   }
 
@@ -214,44 +207,6 @@ function handleYoutube() {
     runFnOnShortcutDown((evt) => {
       !g_newMaximizeBtn && appendNewMaximizeBtn();
       handleToggleFullScreen(null, { noFullscreen: evt && evt.shiftKey });
-    })
-  );
-}
-
-function handleOthers() {
-  document.addEventListener(
-    'keydown',
-    runFnOnShortcutDown(() => {
-      const cssStr = `
-      body, html {
-        overflow: hidden !important;
-      }
-
-      #streamIframe#streamIframe,
-      #player#player iframe,
-      .Video.Video.Video.Video iframe,
-      video:not([playsinline]) {
-        position: fixed !important;
-        top: 0 !important;
-        left: 0 !important;
-        height: 100% !important;
-        width: 100% !important;
-        z-index: 99999999 !important;
-        max-width: none !important;
-        max-height: none !important;
-      }`;
-
-      const head = document.head || document.getElementsByTagName('head')[0];
-      const currentStyleEl = document.getElementById(
-        'ce-video-actions-styletag'
-      );
-
-      if (currentStyleEl) return currentStyleEl.remove();
-
-      const style = document.createElement('style');
-      style.appendChild(document.createTextNode(cssStr));
-      style.setAttribute('id', 'ce-video-actions-styletag');
-      head.appendChild(style);
     })
   );
 }
