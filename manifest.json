@@ -1,12 +1,11 @@
 {
   "name": "Video Actions",
-  "description": "Injects actions to the video player for Twitch and Youtube",
+  "description": "Injects actions to the video player for popular video sites",
   "version": "1.0",
   "manifest_version": 3,
   "content_scripts": [
     {
       "matches": [
-        "https://www.twitch.tv/*",
         "https://www.youtube.com/*"
       ],
       "js": ["inject.js"]
